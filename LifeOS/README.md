@@ -1,5 +1,17 @@
 # LifeOS — Android Scaffold
 
+📚 **Full project documentation now lives in [`/docs`](./docs)** — a
+complete, code-audited knowledge base covering architecture, database,
+security, deployment, known issues, roadmap, and a founder-friendly guide.
+Start with [`docs/00_PROJECT_OVERVIEW.md`](./docs/00_PROJECT_OVERVIEW.md)
+(non-technical) or [`docs/19_DEVELOPER_HANDOVER.md`](./docs/19_DEVELOPER_HANDOVER.md)
+(new developer). The self-audit summary is in [`docs/DOCUMENTATION_AUDIT.md`](./docs/DOCUMENTATION_AUDIT.md).
+
+This file remains as a quick build reference; `/docs` is the authoritative,
+detailed source going forward.
+
+---
+
 A real, working Kotlin + Jetpack Compose implementation of the LifeOS PRD:
 a local-first personal life-management app (Notes, Tasks, Habits, Expenses,
 Diary, unified Timeline, and an optional AI layer).
