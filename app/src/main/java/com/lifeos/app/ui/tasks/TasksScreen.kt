@@ -1,0 +1,165 @@
+package com.lifeos.app.ui.tasks
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.lifeos.app.core.di.LambdaViewModelFactory
+import com.lifeos.app.core.di.LocalServiceLocator
+import com.lifeos.app.core.util.DateTimeUtils
+import com.lifeos.app.data.db.entities.TaskEntity
+import com.lifeos.app.data.repository.TaskRepository
+import com.lifeos.app.ui.components.GlassCard
+import com.lifeos.app.ui.components.ReminderTimePickerDialog
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
+import java.time.LocalTime
+import java.time.ZoneId
+
+class TasksViewModel(private val taskRepository: TaskRepository) : ViewModel() {
+    private val today = DateTimeUtils.today().toEpochDay()
+
+    val tasksToday: StateFlow<List<TaskEntity>> = taskRepository.observeForDay(today)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    val overdue: StateFlow<List<TaskEntity>> = taskRepository.observeOverdue(today)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    fun toggleTask(id: String, completed: Boolean) = viewModelScope.launch { taskRepository.setCompleted(id, completed) }
+
+    fun addQuickTask(title: String, reminderTime: LocalTime?) {
+        if (title.isBlank()) return
+        viewModelScope.launch {
+            val reminderMillis = reminderTime?.let {
+                DateTimeUtils.epochDayToLocalDate(today).atTime(it)
+                    .atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
+            }
+            taskRepository.createTask(title = title, dueDateEpochDay = today, reminderEpochMillis = reminderMillis)
+        }
+    }
+
+    fun keepForTomorrow(id: String) = viewModelScope.launch { taskRepository.keepForTomorrow(id, today) }
+}
+
+@Composable
+fun TasksScreen() {
+    val locator = LocalServiceLocator.current
+    val viewModel: TasksViewModel = viewModel(factory = LambdaViewModelFactory { TasksViewModel(locator.taskRepository) })
+
+    val today by viewModel.tasksToday.collectAsState()
+    val overdue by viewModel.overdue.collectAsState()
+    var showAddDialog by remember { mutableStateOf(false) }
+    var showTimePicker by remember { mutableStateOf(false) }
+    var newTaskText by remember { mutableStateOf("") }
+    var reminderTime by remember { mutableStateOf<LocalTime?>(null) }
+
+    Scaffold(
+        topBar = { TopAppBar(title = { Text("Tasks") }) },
+        floatingActionButton = {
+            FloatingActionButton(onClick = { showAddDialog = true }) { Icon(Icons.Filled.Add, contentDescription = "Add task") }
+        }
+    ) { padding ->
+        LazyColumn(
+            modifier = Modifier.padding(padding).fillMaxWidth(),
+            contentPadding = PaddingValues(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            if (overdue.isNotEmpty()) {
+                item { Text("Overdue", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.error) }
+                items(overdue, key = { "overdue-${it.id}" }) { task ->
+                    TaskRow(task, onToggle = { viewModel.toggleTask(task.id, it) }, onKeepForTomorrow = { viewModel.keepForTomorrow(task.id) })
+                }
+            }
+
+            item { Text("Today", style = MaterialTheme.typography.titleMedium) }
+            if (today.isEmpty()) {
+                item { Text("No tasks for today. Tap + to add one.", style = MaterialTheme.typography.bodySmall) }
+            }
+            items(today, key = { it.id }) { task ->
+                TaskRow(task, onToggle = { viewModel.toggleTask(task.id, it) }, onKeepForTomorrow = { viewModel.keepForTomorrow(task.id) })
+            }
+        }
+    }
+
+    if (showAddDialog) {
+        AlertDialog(
+            onDismissRequest = { showAddDialog = false },
+            title = { Text("New task") },
+            text = {
+                Column {
+                    OutlinedTextField(value = newTaskText, onValueChange = { newTaskText = it }, placeholder = { Text("What do you need to do?") })
+                    TextButton(onClick = { showTimePicker = true }) {
+                        Icon(Icons.Filled.Notifications, contentDescription = null, modifier = Modifier.padding(end = 4.dp))
+                        Text(reminderTime?.let { "Remind at $it" } ?: "Set a reminder (optional)")
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    viewModel.addQuickTask(newTaskText, reminderTime)
+                    newTaskText = ""
+                    reminderTime = null
+                    showAddDialog = false
+                }) { Text("Add") }
+            },
+            dismissButton = { TextButton(onClick = { showAddDialog = false }) { Text("Cancel") } }
+        )
+    }
+
+    if (showTimePicker) {
+        ReminderTimePickerDialog(
+            onDismiss = { showTimePicker = false },
+            onConfirm = { time -> reminderTime = time; showTimePicker = false }
+        )
+    }
+}
+
+@Composable
+private fun TaskRow(task: TaskEntity, onToggle: (Boolean) -> Unit, onKeepForTomorrow: () -> Unit) {
+    GlassCard(modifier = Modifier.fillMaxWidth()) {
+        Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+            Checkbox(checked = task.isCompleted, onCheckedChange = onToggle)
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    task.title,
+                    style = MaterialTheme.typography.bodyLarge,
+                    textDecoration = if (task.isCompleted) TextDecoration.LineThrough else TextDecoration.None
+                )
+                task.description?.let { Text(it, style = MaterialTheme.typography.bodySmall) }
+            }
+            if (!task.isCompleted) {
+                TextButton(onClick = onKeepForTomorrow) { Text("Tomorrow") }
+            }
+        }
+    }
+}
