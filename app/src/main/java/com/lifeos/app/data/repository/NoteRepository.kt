@@ -85,7 +85,7 @@ class NoteRepository(private val dao: NoteDao) {
     }
 
     fun decodeBlocks(note: NoteEntity): List<NoteBlock> = try {
-        json.decodeFromString(kotlinx.serialization.builtins.ListSerializer(NoteBlock.serializer()), note.contentJson)
+        json.decodeFromString<List<NoteBlock>>(note.contentJson)
     } catch (e: Exception) {
         emptyList()
     }
@@ -99,6 +99,8 @@ class NoteRepository(private val dao: NoteDao) {
             is NoteBlock.ChecklistItem -> block.text
         }
     }
+
+    suspend fun getCreatedBetween(startMillis: Long, endMillis: Long): List<NoteEntity> = dao.getCreatedBetween(startMillis, endMillis)
 
     suspend fun getAllForBackup(): List<NoteEntity> = dao.getAllForBackup()
     suspend fun restoreFromBackup(notes: List<NoteEntity>) = notes.forEach { dao.upsert(it) }

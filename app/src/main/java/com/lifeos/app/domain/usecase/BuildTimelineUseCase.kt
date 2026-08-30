@@ -7,6 +7,7 @@ import com.lifeos.app.data.repository.ExpenseRepository
 import com.lifeos.app.data.repository.HabitRepository
 import com.lifeos.app.data.repository.NoteRepository
 import com.lifeos.app.data.repository.TaskRepository
+import kotlinx.coroutines.flow.first
 import com.lifeos.app.domain.model.ExpenseCategories
 import com.lifeos.app.domain.model.TimelineItem
 import com.lifeos.app.domain.model.TimelineItemType
@@ -55,8 +56,8 @@ class BuildTimelineUseCase(
         }
 
         // Habits completed that day (repositories expose Flow; take the first/current emission)
-        val habitsToday = kotlinx.coroutines.flow.first(habitRepo.observeAllForDay(epochDay))
-        val habitsById = kotlinx.coroutines.flow.first(habitRepo.observeAll()).associateBy { it.id }
+        val habitsToday = habitRepo.observeAllForDay(epochDay).first()
+        val habitsById = habitRepo.observeAll().first().associateBy { it.id }
         items += habitsToday.filter { completion -> 
             val habit = habitsById[completion.habitId]
             habit != null && completion.progressCount >= habit.goalCount
@@ -71,7 +72,7 @@ class BuildTimelineUseCase(
         }
 
         // Expenses
-        val expenses = kotlinx.coroutines.flow.first(expenseRepo.observeForDay(epochDay))
+        val expenses = expenseRepo.observeForDay(epochDay).first()
         items += expenses.map {
             TimelineItem(
                 id = "expense-${it.id}", type = TimelineItemType.EXPENSE,
@@ -82,7 +83,7 @@ class BuildTimelineUseCase(
         }
 
         // Diary
-        val diaryEntries = kotlinx.coroutines.flow.first(diaryRepo.observeForDay(epochDay))
+        val diaryEntries = diaryRepo.observeForDay(epochDay).first()
         items += diaryEntries.map {
             TimelineItem(
                 id = "diary-${it.id}", type = TimelineItemType.DIARY,
@@ -93,7 +94,7 @@ class BuildTimelineUseCase(
         }
 
         // Captures
-        val captures = kotlinx.coroutines.flow.first(captureRepo.observeForDay(epochDay))
+        val captures = captureRepo.observeForDay(epochDay).first()
         items += captures.map {
             val icon = when (it.type.name) {
                 "PHOTO" -> "📷"; "VIDEO" -> "🎥"; "AUDIO" -> "🎙"; else -> "💭"

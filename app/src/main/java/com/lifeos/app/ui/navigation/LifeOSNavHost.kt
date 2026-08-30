@@ -31,6 +31,7 @@ import com.lifeos.app.ui.tasks.TasksScreen
 import com.lifeos.app.ui.timeline.TimelineScreen
 
 @androidx.compose.material3.ExperimentalMaterial3Api
+@OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 @Composable
 fun LifeOSNavHost() {
     val navController = rememberNavController()

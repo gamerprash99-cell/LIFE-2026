@@ -16,6 +16,7 @@ class TaskRepository(private val dao: TaskDao, private val appContext: Context) 
     fun observeAll(): Flow<List<TaskEntity>> = dao.observeAll()
     fun observeCountForDay(epochDay: Long): Flow<Int> = dao.observeCountForDay(epochDay)
     fun observeCompletedCountForDay(epochDay: Long): Flow<Int> = dao.observeCompletedCountForDay(epochDay)
+    suspend fun getCreatedBetween(startMillis: Long, endMillis: Long): List<TaskEntity> = dao.getCreatedBetween(startMillis, endMillis)
 
     suspend fun getById(id: String): TaskEntity? = dao.getById(id)
 

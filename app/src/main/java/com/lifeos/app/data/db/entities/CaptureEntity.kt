@@ -1,8 +1,10 @@
 package com.lifeos.app.data.db.entities
 
+import kotlinx.serialization.Serializable
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
+@Serializable
 enum class CaptureType { PHOTO, VIDEO, AUDIO, THOUGHT }
 
 /**
@@ -12,6 +14,7 @@ enum class CaptureType { PHOTO, VIDEO, AUDIO, THOUGHT }
  * consistent with "local-data-first" (Section 2).
  */
 @Entity(tableName = "captures")
+@Serializable
 data class CaptureEntity(
     @PrimaryKey val id: String,
     val type: CaptureType,

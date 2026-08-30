@@ -1,5 +1,6 @@
 package com.lifeos.app.data.db.entities
 
+import kotlinx.serialization.Serializable
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
@@ -11,6 +12,7 @@ import androidx.room.PrimaryKey
  * confirmed by the user before it counts toward streaks/insights.
  */
 @Entity(tableName = "diary_entries")
+@Serializable
 data class DiaryEntity(
     @PrimaryKey val id: String,
     val title: String? = null,

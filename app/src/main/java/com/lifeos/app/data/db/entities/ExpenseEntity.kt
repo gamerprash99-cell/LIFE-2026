@@ -1,8 +1,10 @@
 package com.lifeos.app.data.db.entities
 
+import kotlinx.serialization.Serializable
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
+@Serializable
 enum class PaymentMethod { CASH, UPI, CARD, BANK, OTHER }
 
 /**
@@ -11,6 +13,7 @@ enum class PaymentMethod { CASH, UPI, CARD, BANK, OTHER }
  * later without a schema migration.
  */
 @Entity(tableName = "expenses")
+@Serializable
 data class ExpenseEntity(
     @PrimaryKey val id: String,
     val amount: Double,

@@ -63,7 +63,7 @@ class BackupRepository(
     }
 
     suspend fun importFromFile(file: File) {
-        val backup = json.decodeFromString(LifeOSBackup.serializer(), file.readText())
+        val backup = json.decodeFromString<LifeOSBackup>(file.readText())
         restore(backup)
     }
 

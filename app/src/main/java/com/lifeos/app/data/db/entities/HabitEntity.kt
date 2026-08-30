@@ -1,8 +1,10 @@
 package com.lifeos.app.data.db.entities
 
+import kotlinx.serialization.Serializable
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
+@Serializable
 enum class HabitFrequency { DAILY, WEEKLY, CUSTOM }
 
 /**
@@ -11,6 +13,7 @@ enum class HabitFrequency { DAILY, WEEKLY, CUSTOM }
  * Home dashboard mock (Section 5), not just binary done/not-done.
  */
 @Entity(tableName = "habits")
+@Serializable
 data class HabitEntity(
     @PrimaryKey val id: String,
     val name: String,
@@ -32,6 +35,7 @@ data class HabitEntity(
  * Missed / Partial / Completed / Exceptional).
  */
 @Entity(tableName = "habit_completions", primaryKeys = ["habitId", "dateEpochDay"])
+@Serializable
 data class HabitCompletionEntity(
     val habitId: String,
     val dateEpochDay: Long,
