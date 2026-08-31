@@ -1,6 +1,7 @@
 package com.lifeos.app.data.db.entities
 
 import androidx.room.Entity
+import kotlinx.serialization.Serializable
 import androidx.room.PrimaryKey
 
 enum class CaptureType { PHOTO, VIDEO, AUDIO, THOUGHT }
@@ -11,6 +12,7 @@ enum class CaptureType { PHOTO, VIDEO, AUDIO, THOUGHT }
  * `filePath` points into app-private local storage — never a cloud URI —
  * consistent with "local-data-first" (Section 2).
  */
+@Serializable
 @Entity(tableName = "captures")
 data class CaptureEntity(
     @PrimaryKey val id: String,

@@ -1,6 +1,7 @@
 package com.lifeos.app.data.db.entities
 
 import androidx.room.Entity
+import kotlinx.serialization.Serializable
 import androidx.room.PrimaryKey
 
 /**
@@ -10,6 +11,7 @@ import androidx.room.PrimaryKey
  * must be reviewable" — an AI-drafted entry starts unreviewed and must be
  * confirmed by the user before it counts toward streaks/insights.
  */
+@Serializable
 @Entity(tableName = "diary_entries")
 data class DiaryEntity(
     @PrimaryKey val id: String,

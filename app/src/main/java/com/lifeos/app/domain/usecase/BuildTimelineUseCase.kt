@@ -10,6 +10,7 @@ import com.lifeos.app.data.repository.TaskRepository
 import com.lifeos.app.domain.model.ExpenseCategories
 import com.lifeos.app.domain.model.TimelineItem
 import com.lifeos.app.domain.model.TimelineItemType
+import kotlinx.coroutines.flow.first
 import java.time.ZoneOffset
 
 /**
@@ -46,7 +47,7 @@ class BuildTimelineUseCase(
         // Tasks completed that day
         val completedTasks = taskRepo.getCreatedBetween(startMillis, endMillis).filter { it.isCompleted }
         items += completedTasks.map {
-            val minutes = it.completedAtEpochMillis?.let(::epochMillisToMinutesOfDay) ?: 0
+            val minutes = it.completedAtEpochMillis?.let { millis -> epochMillisToMinutesOfDay(millis) } ?: 0
             TimelineItem(
                 id = "task-${it.id}", type = TimelineItemType.TASK_COMPLETED, title = it.title,
                 subtitle = "Task completed", dateEpochDay = epochDay, timeMinutes = minutes, icon = "✅", sourceId = it.id,
@@ -55,8 +56,8 @@ class BuildTimelineUseCase(
         }
 
         // Habits completed that day (repositories expose Flow; take the first/current emission)
-        val habitsToday = kotlinx.coroutines.flow.first(habitRepo.observeAllForDay(epochDay))
-        val habitsById = kotlinx.coroutines.flow.first(habitRepo.observeAll()).associateBy { it.id }
+        val habitsToday = habitRepo.observeAllForDay(epochDay).first()
+        val habitsById = habitRepo.observeAll().first().associateBy { it.id }
         items += habitsToday.filter { completion -> 
             val habit = habitsById[completion.habitId]
             habit != null && completion.progressCount >= habit.goalCount
@@ -71,7 +72,7 @@ class BuildTimelineUseCase(
         }
 
         // Expenses
-        val expenses = kotlinx.coroutines.flow.first(expenseRepo.observeForDay(epochDay))
+        val expenses = expenseRepo.observeForDay(epochDay).first()
         items += expenses.map {
             TimelineItem(
                 id = "expense-${it.id}", type = TimelineItemType.EXPENSE,
@@ -82,7 +83,7 @@ class BuildTimelineUseCase(
         }
 
         // Diary
-        val diaryEntries = kotlinx.coroutines.flow.first(diaryRepo.observeForDay(epochDay))
+        val diaryEntries = diaryRepo.observeForDay(epochDay).first()
         items += diaryEntries.map {
             TimelineItem(
                 id = "diary-${it.id}", type = TimelineItemType.DIARY,
@@ -93,7 +94,7 @@ class BuildTimelineUseCase(
         }
 
         // Captures
-        val captures = kotlinx.coroutines.flow.first(captureRepo.observeForDay(epochDay))
+        val captures = captureRepo.observeForDay(epochDay).first()
         items += captures.map {
             val icon = when (it.type.name) {
                 "PHOTO" -> "📷"; "VIDEO" -> "🎥"; "AUDIO" -> "🎙"; else -> "💭"

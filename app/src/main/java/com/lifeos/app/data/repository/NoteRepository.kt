@@ -7,6 +7,7 @@ import com.lifeos.app.domain.model.NoteBlock
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.serializer
 
 class NoteRepository(private val dao: NoteDao) {
 
@@ -23,6 +24,7 @@ class NoteRepository(private val dao: NoteDao) {
     fun observeCount(): Flow<Int> = dao.observeCount()
 
     suspend fun getById(id: String): NoteEntity? = dao.getById(id)
+    suspend fun getCreatedBetween(startMillis: Long, endMillis: Long): List<NoteEntity> = dao.getCreatedBetween(startMillis, endMillis)
 
     suspend fun createNote(
         title: String,

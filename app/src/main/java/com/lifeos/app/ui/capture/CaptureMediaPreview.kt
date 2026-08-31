@@ -25,6 +25,8 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -145,7 +147,7 @@ fun AudioPreview(filePath: String, modifier: Modifier = Modifier) {
 
     LaunchedEffect(isPlaying) {
         while (isPlaying) {
-            positionMs = mediaPlayer?.let { if (it.isPlaying) it.currentPosition.toLong() else positionMs } ?: positionMs
+            positionMs = mediaPlayer?.let { player -> if (player.isPlaying) player.currentPosition.toLong() else positionMs } ?: positionMs
             delay(250)
         }
     }

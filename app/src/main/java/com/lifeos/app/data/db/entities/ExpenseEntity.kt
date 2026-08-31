@@ -1,6 +1,7 @@
 package com.lifeos.app.data.db.entities
 
 import androidx.room.Entity
+import kotlinx.serialization.Serializable
 import androidx.room.PrimaryKey
 
 enum class PaymentMethod { CASH, UPI, CARD, BANK, OTHER }
@@ -10,6 +11,7 @@ enum class PaymentMethod { CASH, UPI, CARD, BANK, OTHER }
  * ExpenseCategories (domain layer) so users can still add custom categories
  * later without a schema migration.
  */
+@Serializable
 @Entity(tableName = "expenses")
 data class ExpenseEntity(
     @PrimaryKey val id: String,
