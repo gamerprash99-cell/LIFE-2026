@@ -1,0 +1,19 @@
+{
+    "logs": [
+        {
+            "outputFile": "com.lifeos.app-mergeDebugResources-2:/values-port/values-port.xml",
+            "map": [
+                {
+                    "source": "/home/jules/.gradle/caches/8.8/transforms/e6eaf29fadc400685600bb98d13713eb/transformed/appcompat-1.6.1/res/values-port/values-port.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endColumns": "55",
+                        "endOffsets": "106"
+                    }
+                }
+            ]
+        }
+    ]
+}
