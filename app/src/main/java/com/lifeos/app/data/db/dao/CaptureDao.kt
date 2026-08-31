@@ -24,6 +24,9 @@ interface CaptureDao {
     @Query("SELECT * FROM captures WHERE dateEpochDay = :epochDay ORDER BY timeMinutes DESC")
     fun observeForDay(epochDay: Long): Flow<List<CaptureEntity>>
 
+    @Query("SELECT * FROM captures WHERE id = :id LIMIT 1")
+    suspend fun getById(id: String): CaptureEntity?
+
     @Query("SELECT COUNT(*) FROM captures WHERE dateEpochDay BETWEEN :startEpochDay AND :endEpochDay")
     suspend fun countInRange(startEpochDay: Long, endEpochDay: Long): Int
 

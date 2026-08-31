@@ -18,6 +18,9 @@ sealed class Screen(val route: String) {
         fun createRoute(entryId: String? = null) = "diary/editor?entryId=${entryId ?: ""}"
     }
     object Timeline : Screen("timeline")
+    object CaptureDetail : Screen("capture/{captureId}") {
+        fun createRoute(captureId: String) = "capture/$captureId"
+    }
     object Insights : Screen("insights")
     object Search : Screen("search")
     object AiAssistant : Screen("ai_assistant")

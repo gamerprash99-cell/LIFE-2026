@@ -90,11 +90,13 @@ Full inventory of every implemented feature, with exact file paths.
 
 **Purpose**: Quick, in-the-moment capture of a memory.
 
-- **Files**: `ui/capture/CaptureSheet.kt` (bottom sheet menu), `ui/capture/CameraCaptureScreen.kt` (photo, via CameraX ImageCapture), `ui/capture/VideoCaptureScreen.kt` (video, via CameraX VideoCapture/Recorder), `ui/capture/AudioCaptureScreen.kt` (via android.media.MediaRecorder)
+- **Files**: `ui/capture/CaptureSheet.kt` (bottom sheet menu), `ui/capture/CameraCaptureScreen.kt` (photo, via CameraX ImageCapture), `ui/capture/VideoCaptureScreen.kt` (video, via CameraX VideoCapture/Recorder), `ui/capture/AudioCaptureScreen.kt` (via android.media.MediaRecorder), `ui/capture/CaptureDetailScreen.kt` (full viewer, added in the UI/UX pass), `ui/capture/CaptureMediaPreview.kt` + `MediaPreviewUtils.kt` (shared preview composables, added in the UI/UX pass)
 - **Storage**: `core/util/MediaStorage.kt` — all captured files are written to app-private storage (context.filesDir/captures/), never to shared/public storage or MediaStore
 - **Permissions**: Requested at the moment the relevant capture screen opens, via `core/util/PermissionManager.kt`'s `rememberPermissionState()` — never at app launch
-- **Database**: `data/db/entities/CaptureEntity.kt`, `data/repository/CaptureRepository.kt`
-- **Status**: Implemented (all four capture types are real, working code, not stubs)
+- **Database**: `data/db/entities/CaptureEntity.kt`, `data/repository/CaptureRepository.kt` (now includes `getById()`, a minimal additive read method added for the Detail screen — no schema change)
+- **Post-capture confirmation** (fixed during the UI/UX pass; see `docs/16_KNOWN_ISSUES.md`): after a Photo/Video/Audio capture, `CaptureSheet` now shows a CONFIRM state with a real preview of the captured file before closing, instead of dismissing silently.
+- **Timeline integration**: tapping a capture item in `TimelineScreen.kt` now opens `CaptureDetailScreen`, showing the real preview, date/time, and a Delete action.
+- **Status**: Implemented (all four capture types are real, working code, not stubs; post-capture confirmation and a Detail/viewer screen were added)
 
 ## 10. AI Assistant (Chat)
 
@@ -148,7 +150,9 @@ Full inventory of every implemented feature, with exact file paths.
 
 ## 16. Settings
 
-**Purpose**: App Lock toggle, AI feature toggle + API key entry, Reminders toggle, Backup/Export/Share.
+**Purpose**: App Lock toggle, AI feature toggle, Reminders toggle, Backup/Export/Share.
+
+**Update (UI/UX pass)**: the visible "Anthropic API key" text field and "Save API key" button were removed from the AI Features card at the product owner's explicit request — the raw developer-key-paste UI didn't fit the intended production experience. The underlying storage mechanism (`SettingsStore.aiApiKey`/`setAiApiKey()`) was **not** deleted, only its UI entry point. **Consequence**: as of this change, there is currently no way for a user to set an AI API key through the app UI, so AI features will show their existing "Add your AI API key in Settings..." fallback message until a proper configuration mechanism is designed (see `docs/16_KNOWN_ISSUES.md`).
 
 - **Files**: `ui/settings/SettingsScreen.kt`
 - **Status**: Implemented

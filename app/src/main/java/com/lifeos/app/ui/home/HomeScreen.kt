@@ -61,7 +61,10 @@ fun HomeScreen(
     ) { padding ->
         LazyColumn(
             modifier = Modifier.padding(padding).fillMaxWidth(),
-            contentPadding = androidx.compose.foundation.layout.PaddingValues(16.dp),
+            contentPadding = androidx.compose.foundation.layout.PaddingValues(
+                start = 16.dp, end = 16.dp, top = 16.dp,
+                bottom = com.lifeos.app.ui.theme.LifeOSSpacing.extendedFabContentClearance
+            ),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             item {

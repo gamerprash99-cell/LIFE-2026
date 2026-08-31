@@ -11,6 +11,7 @@ class CaptureRepository(private val dao: CaptureDao) {
     fun observeLatest(): Flow<CaptureEntity?> = dao.observeLatest()
     fun observeAll(): Flow<List<CaptureEntity>> = dao.observeAll()
     fun observeForDay(epochDay: Long): Flow<List<CaptureEntity>> = dao.observeForDay(epochDay)
+    suspend fun getById(id: String): CaptureEntity? = dao.getById(id)
 
     suspend fun addCapture(
         type: CaptureType,

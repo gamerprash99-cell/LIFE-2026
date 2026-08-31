@@ -5,15 +5,15 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -79,16 +79,17 @@ fun SettingsScreen() {
 
     val appLockEnabled by viewModel.appLockEnabled.collectAsState(initial = false)
     val aiFeaturesEnabled by viewModel.aiFeaturesEnabled.collectAsState(initial = false)
-    val savedKey by viewModel.aiApiKey.collectAsState(initial = null)
     val exportStatus by viewModel.exportStatus.collectAsState()
     val lastExportedFile by viewModel.lastExportedFile.collectAsState()
 
-    var apiKeyInput by remember { mutableStateOf("") }
-    LaunchedEffect(savedKey) { apiKeyInput = savedKey.orEmpty() }
-
     Scaffold(topBar = { TopAppBar(title = { Text("Settings") }) }) { padding ->
         Column(
-            modifier = Modifier.padding(padding).fillMaxWidth().padding(16.dp),
+            modifier = Modifier
+                .padding(padding)
+                .fillMaxWidth()
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 16.dp)
+                .padding(top = 16.dp, bottom = 32.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             GlassCard(modifier = Modifier.fillMaxWidth()) {
@@ -113,17 +114,9 @@ fun SettingsScreen() {
                         "LifeOS AI features (note actions, task extraction, weekly review, chat) only run " +
                             "when you explicitly trigger them, and only send the specific text/context needed " +
                             "for that action — never your whole database.",
-                        style = MaterialTheme.typography.labelSmall
+                        style = MaterialTheme.typography.labelSmall,
+                        modifier = Modifier.padding(top = 4.dp)
                     )
-                    OutlinedTextField(
-                        value = apiKeyInput,
-                        onValueChange = { apiKeyInput = it },
-                        placeholder = { Text("Anthropic API key") },
-                        modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
-                    )
-                    Button(onClick = { viewModel.saveApiKey(apiKeyInput) }, modifier = Modifier.padding(top = 8.dp)) {
-                        Text("Save API key")
-                    }
                 }
             }
 

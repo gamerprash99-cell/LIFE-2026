@@ -15,6 +15,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.lifeos.app.ui.ai.AiAssistantScreen
+import com.lifeos.app.ui.capture.CaptureDetailScreen
 import com.lifeos.app.ui.capture.CaptureSheet
 import com.lifeos.app.ui.components.LifeOSBottomBar
 import com.lifeos.app.ui.diary.DiaryScreen
@@ -80,7 +81,18 @@ fun LifeOSNavHost() {
             }
             composable(Screen.Expenses.route) { ExpensesScreen() }
             composable(Screen.Diary.route) { DiaryScreen() }
-            composable(Screen.Timeline.route) { TimelineScreen() }
+            composable(Screen.Timeline.route) {
+                TimelineScreen(
+                    onOpenCapture = { captureId -> navController.navigate(Screen.CaptureDetail.createRoute(captureId)) }
+                )
+            }
+            composable(
+                Screen.CaptureDetail.route,
+                arguments = listOf(navArgument("captureId") { type = NavType.StringType })
+            ) { entry ->
+                val captureId = entry.arguments?.getString("captureId").orEmpty()
+                CaptureDetailScreen(captureId = captureId, onBack = { navController.popBackStack() })
+            }
             composable(Screen.Insights.route) { InsightsScreen() }
             composable(Screen.Search.route) { SearchScreen() }
             composable(Screen.AiAssistant.route) { AiAssistantScreen() }

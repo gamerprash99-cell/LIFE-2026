@@ -130,3 +130,22 @@
 - **Severity**: 🟡 Medium (process/quality risk, not a functional bug)
 - **Description**: See `docs/14_TESTING.md`.
 - **Status**: Open
+
+---
+
+### Issue #10 — [RESOLVED] Capture gave no confirmation after Photo/Video/Audio capture
+
+- **Severity**: 🟠 High (was — core UX bug)
+- **Description**: `CaptureSheet.kt` wrote the file and database row correctly, then called `onDismiss()` immediately — the bottom sheet closed with no visible feedback, making it look like capture had silently failed even though the data was saved correctly.
+- **Fix**: `CaptureSheet.kt` now shows a CONFIRM state with a real preview of the captured file (`ui/capture/CaptureMediaPreview.kt`) and a "Done" button before closing. A new `CaptureDetailScreen.kt` also lets the user reopen any captured item later from the Timeline (tap-to-open was added to `TimelineScreen.kt` for capture items).
+- **Status**: Resolved in the UI/UX polish pass.
+
+---
+
+### Issue #11 — No way to set an AI API key through the UI
+
+- **Severity**: 🟠 High (AI features are currently unreachable for a new user)
+- **Description**: The "Anthropic API key" input field was removed from Settings at the product owner's explicit request (the raw key-paste UI didn't match the intended production experience). No replacement configuration mechanism was introduced — this was an explicit instruction, not something discovered independently.
+- **Reproduction**: Try any AI feature (note actions, task extraction, diary draft, weekly review, AI Assistant chat) on a fresh install — all show "Add your AI API key in Settings..." with no way to actually do that.
+- **Current workaround**: None via the UI. `SettingsStore.setAiApiKey()` still exists and could be called programmatically (e.g. temporarily via a debug build) until a proper mechanism is designed.
+- **Status**: Open — needs a product decision on the intended production AI-configuration mechanism (e.g. a server-mediated key, a bundled default key, or a redesigned settings flow) before AI features are usable by end users again.

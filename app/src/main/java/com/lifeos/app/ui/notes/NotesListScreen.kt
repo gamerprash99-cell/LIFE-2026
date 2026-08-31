@@ -58,7 +58,10 @@ fun NotesListScreen(onOpenNote: (String?) -> Unit) {
         } else {
             LazyColumn(
                 modifier = Modifier.padding(padding).fillMaxWidth(),
-                contentPadding = PaddingValues(16.dp),
+                contentPadding = PaddingValues(
+                    start = 16.dp, end = 16.dp, top = 16.dp,
+                    bottom = com.lifeos.app.ui.theme.LifeOSSpacing.fabContentClearance
+                ),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 items(notes, key = { it.id }) { note ->
