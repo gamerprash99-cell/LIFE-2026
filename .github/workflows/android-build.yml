@@ -34,7 +34,11 @@ jobs:
       - name: Set up Android SDK
         # Installs the SDK platforms/build-tools needed for
         # compileSdk = 35 / targetSdk = 35 (app/build.gradle.kts).
+        # Accepts all licenses non-interactively automatically.
         uses: android-actions/setup-android@v3
+        with:
+          accept-android-sdk-licenses: true
+          packages: 'platforms;android-35 build-tools;35.0.0 platform-tools'
 
       - name: Set up Gradle (version pinned to match gradle-wrapper.properties)
         uses: gradle/actions/setup-gradle@v4
