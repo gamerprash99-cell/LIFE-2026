@@ -1,6 +1,7 @@
 package com.lifeos.app.data.db.entities
 
 import androidx.room.Entity
+import kotlinx.serialization.Serializable
 import androidx.room.PrimaryKey
 
 /**
@@ -9,6 +10,7 @@ import androidx.room.PrimaryKey
  * headings, checklists, bullet/numbered lists, highlights) so the editor can
  * support real rich formatting without needing a second table per block type.
  */
+@Serializable
 @Entity(tableName = "notes")
 data class NoteEntity(
     @PrimaryKey val id: String,

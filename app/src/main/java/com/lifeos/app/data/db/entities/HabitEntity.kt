@@ -1,6 +1,7 @@
 package com.lifeos.app.data.db.entities
 
 import androidx.room.Entity
+import kotlinx.serialization.Serializable
 import androidx.room.PrimaryKey
 
 enum class HabitFrequency { DAILY, WEEKLY, CUSTOM }
@@ -10,6 +11,7 @@ enum class HabitFrequency { DAILY, WEEKLY, CUSTOM }
  * `goalCount` supports quantity-based habits like "Drink Water 8/8" from the
  * Home dashboard mock (Section 5), not just binary done/not-done.
  */
+@Serializable
 @Entity(tableName = "habits")
 data class HabitEntity(
     @PrimaryKey val id: String,
@@ -31,6 +33,7 @@ data class HabitEntity(
  * drives both the checkmark UI and the heatmap intensity levels (Section 13:
  * Missed / Partial / Completed / Exceptional).
  */
+@Serializable
 @Entity(tableName = "habit_completions", primaryKeys = ["habitId", "dateEpochDay"])
 data class HabitCompletionEntity(
     val habitId: String,

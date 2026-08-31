@@ -1,6 +1,7 @@
 package com.lifeos.app.data.db.entities
 
 import androidx.room.Entity
+import kotlinx.serialization.Serializable
 import androidx.room.PrimaryKey
 
 enum class TaskPriority { HIGH, MEDIUM, LOW }
@@ -13,6 +14,7 @@ enum class RepeatRule { NONE, DAILY, WEEKLY, MONTHLY, CUSTOM_DAYS }
  * task was extracted from, so the app can show "created from this note" —
  * one of the core "connected experience" requirements (Section 60).
  */
+@Serializable
 @Entity(tableName = "tasks")
 data class TaskEntity(
     @PrimaryKey val id: String,

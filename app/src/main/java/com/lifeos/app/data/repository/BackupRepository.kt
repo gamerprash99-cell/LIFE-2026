@@ -11,6 +11,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.io.File
+import kotlinx.serialization.serializer
 
 /**
  * "Your life. Your data." — Section 2/19/59. A complete, human-readable JSON
